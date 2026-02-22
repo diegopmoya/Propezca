@@ -75,14 +75,14 @@ export default function LoginPage() {
   }
 
   return (
-    <Card>
+    <Card className="px-6 py-8">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
         <CardDescription>
-          Ingresa a tu cuenta Propezca
+          Ingresa a tu cuenta para comprar y acumular puntos
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         {error && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {error}
@@ -93,7 +93,7 @@ export default function LoginPage() {
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className="w-full border-muted-foreground/30"
           onClick={handleGoogleLogin}
           disabled={googleLoading}
         >
@@ -110,14 +110,14 @@ export default function LoginPage() {
           Continuar con Google
         </Button>
 
-        <div className="flex items-center gap-3">
+        <div className="my-4 flex items-center gap-3">
           <Separator className="flex-1" />
           <span className="text-xs text-muted-foreground">o continúa con email</span>
           <Separator className="flex-1" />
         </div>
 
         {/* Email form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="email">Correo electrónico</Label>
             <Input
@@ -128,6 +128,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+              className="h-11"
             />
           </div>
 
@@ -141,6 +142,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
+                className="h-11"
               />
               <Button
                 type="button"

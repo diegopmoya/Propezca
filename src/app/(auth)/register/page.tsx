@@ -58,7 +58,7 @@ export default function RegisterPage() {
     setError("");
 
     if (!consent) {
-      setError("Debes aceptar la Política de Privacidad para continuar");
+      setError("Debes aceptar los Términos y Política de Privacidad para continuar");
       setLoading(false);
       return;
     }
@@ -96,15 +96,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <Card>
+    <Card className="px-6 py-8">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Crear Cuenta</CardTitle>
+        <CardTitle className="text-2xl">Crea tu cuenta y empieza a acumular puntos</CardTitle>
         <CardDescription>
-          Regístrate para comenzar a controlar tu negocio
+          Regístrate para acceder a la tienda Propezca
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           {error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
               {error}
@@ -115,7 +115,7 @@ export default function RegisterPage() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full border-muted-foreground/30"
             onClick={handleGoogleRegister}
             disabled={googleLoading}
           >
@@ -132,7 +132,7 @@ export default function RegisterPage() {
             Continuar con Google
           </Button>
 
-          <div className="flex items-center gap-3">
+          <div className="my-4 flex items-center gap-3">
             <Separator className="flex-1" />
             <span className="text-xs text-muted-foreground">o continúa con email</span>
             <Separator className="flex-1" />
@@ -147,6 +147,7 @@ export default function RegisterPage() {
               onChange={(e) => setFullName(e.target.value)}
               required
               autoComplete="name"
+              className="h-11"
             />
           </div>
 
@@ -160,6 +161,19 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+              className="h-11"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="companyName">Nombre de tu empresa</Label>
+            <Input
+              id="companyName"
+              placeholder="Ej: Propezca"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              required
+              className="h-11"
             />
           </div>
 
@@ -174,6 +188,7 @@ export default function RegisterPage() {
                 required
                 minLength={8}
                 autoComplete="new-password"
+                className="h-11"
               />
               <Button
                 type="button"
@@ -191,17 +206,6 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="companyName">Nombre de tu empresa</Label>
-            <Input
-              id="companyName"
-              placeholder="Ej: Propezca"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              required
-            />
-          </div>
-
           {/* Consentimiento Ley 21.719 */}
           <div className="flex items-start gap-2">
             <input
@@ -209,21 +213,18 @@ export default function RegisterPage() {
               id="consent"
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-input"
+              className="mt-1 h-4 w-4 flex-shrink-0 rounded border-input"
               required
             />
-            <Label htmlFor="consent" className="text-sm font-normal leading-tight">
-              Acepto la{" "}
-              <span className="font-medium text-primary">
-                Política de Privacidad
-              </span>{" "}
-              y los{" "}
-              <span className="font-medium text-primary">
-                Términos de Uso
+            <label htmlFor="consent" className="text-sm leading-relaxed text-muted-foreground">
+              Acepto los{" "}
+              <span className="font-medium text-primary">Términos de Uso</span> y la{" "}
+              <span className="font-medium text-primary">Política de Privacidad</span>.
+              <br />
+              <span className="text-xs">
+                Autorizo el tratamiento de datos según Ley 21.719.
               </span>
-              . Autorizo el tratamiento de mis datos personales conforme a la
-              Ley 21.719.
-            </Label>
+            </label>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
