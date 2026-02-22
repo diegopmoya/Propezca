@@ -1,5 +1,6 @@
 // Landing page de Propezca — Tienda de pesca y outdoor en Talca
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -22,7 +23,20 @@ import {
   ShoppingCart,
   ArrowRight,
   MessageCircle,
+  Flame,
+  Sparkles,
 } from "lucide-react";
+import { realProducts } from "@/lib/products-data";
+
+const bestSellers = [...realProducts]
+  .filter((p) => p.stock > 0)
+  .sort((a, b) => b.points - a.points)
+  .slice(0, 8);
+
+const newArrivals = [...realProducts]
+  .filter((p) => p.stock > 0)
+  .slice(-8)
+  .reverse();
 
 // --- HERO ---
 function HeroSection() {
@@ -45,7 +59,7 @@ function HeroSection() {
             en Talca
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80">
-            Más de 600 productos para pesca, caza, buceo y camping.
+            Más de 170 productos para pesca, caza, buceo y camping.
             Las mejores marcas internacionales al mejor precio, con programa de puntos
             en cada compra.
           </p>
@@ -102,6 +116,72 @@ function CategoriesSection() {
                   <p className="mt-3 text-sm font-bold text-primary">
                     {cat.count} productos
                   </p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// --- HELPER: Product grid card ---
+function formatCLP(n: number) {
+  return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(n);
+}
+
+function ProductGrid({
+  title,
+  subtitle,
+  icon: Icon,
+  products,
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ElementType;
+  products: typeof realProducts;
+}) {
+  return (
+    <section className="py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+              <Icon className="h-4 w-4" />
+              {title}
+            </div>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          </div>
+          <Link href="/tienda">
+            <Button variant="outline" size="sm">
+              Ver todo
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-8 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+          {products.map((product) => (
+            <Link key={product.id} href={`/tienda/${product.id}`}>
+              <Card className="group h-full overflow-hidden transition-all hover:shadow-lg hover:border-primary/40">
+                <div className="relative aspect-square bg-muted">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-contain p-2 transition-transform group-hover:scale-105"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                </div>
+                <CardContent className="p-3">
+                  <h3 className="truncate text-sm font-semibold">{product.name}</h3>
+                  <p className="mt-1 text-lg font-bold text-primary">{formatCLP(product.price)}</p>
+                  {product.points > 0 && (
+                    <p className="mt-0.5 text-xs text-accent font-medium">
+                      +{product.points} pts
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -220,7 +300,7 @@ function AboutSection() {
         </p>
         <div className="mt-8 grid gap-6 sm:grid-cols-3">
           <div>
-            <p className="text-3xl font-bold text-primary">600+</p>
+            <p className="text-3xl font-bold text-primary">170+</p>
             <p className="text-sm text-muted-foreground">Productos</p>
           </div>
           <div>
@@ -371,6 +451,18 @@ export default function LandingPage() {
     <>
       <HeroSection />
       <CategoriesSection />
+      <ProductGrid
+        title="Más Vendidos"
+        subtitle="Los favoritos de nuestros clientes"
+        icon={Flame}
+        products={bestSellers}
+      />
+      <ProductGrid
+        title="Nuevos"
+        subtitle="Últimas novedades en nuestra tienda"
+        icon={Sparkles}
+        products={newArrivals}
+      />
       <BrandsSection />
       <PointsSection />
       <AboutSection />
