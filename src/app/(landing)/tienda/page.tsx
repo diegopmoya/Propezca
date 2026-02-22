@@ -88,19 +88,35 @@ function FilterPanel({
 
       <div>
         <Label className="text-sm font-medium">Rango de precio</Label>
-        <div className="mt-1.5 flex gap-2">
-          <Input
-            type="number"
-            placeholder="Mín"
-            value={priceMin}
-            onChange={(e) => setPriceMin(e.target.value)}
-          />
-          <Input
-            type="number"
-            placeholder="Máx"
-            value={priceMax}
-            onChange={(e) => setPriceMax(e.target.value)}
-          />
+        <div className="mt-3 space-y-3">
+          <div>
+            <label className="text-xs text-muted-foreground">Mínimo: {priceMin ? formatCLP(Number(priceMin)) : '$0'}</label>
+            <input
+              type="range"
+              min="0"
+              max="300000"
+              step="1000"
+              value={priceMin || "0"}
+              onChange={(e) => setPriceMin(e.target.value === "0" ? "" : e.target.value)}
+              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">Máximo: {priceMax ? formatCLP(Number(priceMax)) : 'Sin límite'}</label>
+            <input
+              type="range"
+              min="0"
+              max="300000"
+              step="1000"
+              value={priceMax || "300000"}
+              onChange={(e) => setPriceMax(e.target.value === "300000" ? "" : e.target.value)}
+              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+            />
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>$0</span>
+            <span>$300.000</span>
+          </div>
         </div>
       </div>
 

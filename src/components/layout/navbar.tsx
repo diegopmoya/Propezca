@@ -70,7 +70,7 @@ export function Navbar() {
           </Link>
 
           <Link href="/login">
-            <Button variant="outline" size="sm" className="border-white/30 text-white hover:bg-white/10">
+            <Button size="sm" className="bg-white text-primary hover:bg-white/90 font-semibold">
               Ingresar
             </Button>
           </Link>

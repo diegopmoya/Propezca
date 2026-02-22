@@ -1,6 +1,6 @@
 // Footer con identidad Propezca pesca
 import Link from "next/link";
-import { Fish } from "lucide-react";
+import { Fish, Instagram, Facebook, Youtube, MessageCircle } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/constants";
 
 export function Footer() {
@@ -57,6 +57,21 @@ export function Footer() {
                 </a>
               </li>
             </ul>
+            {/* Redes sociales */}
+            <div className="mt-4 flex items-center gap-3">
+              <a href="https://instagram.com/propezca" target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white">
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a href="https://facebook.com/propezca" target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white">
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a href="https://youtube.com/@propezca" target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white">
+                <Youtube className="h-4 w-4" />
+              </a>
+              <a href="https://wa.me/56942007775" target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white">
+                <MessageCircle className="h-4 w-4" />
+              </a>
+            </div>
           </div>
         </div>
 

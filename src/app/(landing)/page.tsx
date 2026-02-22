@@ -70,8 +70,9 @@ function HeroSection() {
                 Ver Productos
               </Button>
             </Link>
-            <a href="#contacto">
-              <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
+            <a href="https://wa.me/56942007775" target="_blank" rel="noopener noreferrer">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 w-full sm:w-auto">
+                <MessageCircle className="mr-2 h-5 w-5" />
                 Contactar por WhatsApp
               </Button>
             </a>
@@ -104,15 +105,17 @@ function CategoriesSection() {
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((cat) => (
             <Link key={cat.title} href="/tienda">
-              <Card className="group cursor-pointer border-2 transition-all hover:border-primary hover:shadow-lg">
-                <CardContent className="flex flex-col items-center py-8">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary/20">
-                    <cat.icon className="h-8 w-8 text-primary" />
+              <Card className="group cursor-pointer border-2 transition-all hover:border-primary hover:shadow-lg h-full">
+                <CardContent className="flex h-full flex-col items-center justify-between py-8">
+                  <div className="flex flex-col items-center">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary/20">
+                      <cat.icon className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="mt-4 text-xl font-semibold">{cat.title}</h3>
+                    <p className="mt-1 h-10 text-center text-sm text-muted-foreground">
+                      {cat.description}
+                    </p>
                   </div>
-                  <h3 className="mt-4 text-xl font-semibold">{cat.title}</h3>
-                  <p className="mt-1 text-center text-sm text-muted-foreground">
-                    {cat.description}
-                  </p>
                   <p className="mt-3 text-sm font-bold text-primary">
                     {cat.count} productos
                   </p>
