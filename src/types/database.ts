@@ -19,6 +19,13 @@ export type UserRole = "owner" | "admin" | "manager" | "operator" | "viewer";
 export type CostType = "last" | "average" | "manual";
 export type UploadStatus = "uploaded" | "processing" | "processed" | "failed" | "archived";
 
+// Sprint 1: Ecommerce + Puntos
+export type OrderStatus = "pending" | "confirmed" | "paid" | "preparing" | "shipped" | "delivered" | "cancelled";
+export type PaymentStatus = "pending" | "confirmed" | "failed" | "refunded";
+export type ShippingMethod = "pickup" | "delivery";
+export type MovementType = "earn" | "redeem" | "expire" | "adjust" | "bonus" | "refund";
+export type Tier = "bronze" | "silver" | "gold";
+
 export interface Tenant {
   id: string;
   slug: string;
@@ -73,6 +80,7 @@ export interface Product {
   metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
+  points_value?: number;
   // Relaciones opcionales
   category?: Category;
   aliases?: ProductAlias[];
@@ -167,6 +175,98 @@ export interface FileUpload {
   metadata: Record<string, unknown>;
   status: UploadStatus;
   created_at: string;
+}
+
+// Sprint 1: Ecommerce + Puntos
+export interface CustomerAddress {
+  id: string;
+  user_id: string;
+  tenant_id: string;
+  label: string;
+  recipient_name: string;
+  street_address: string;
+  city: string;
+  region: string;
+  postal_code?: string;
+  phone?: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Order {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  order_number: string;
+  status: OrderStatus;
+  shipping_address_id?: string;
+  shipping_method: ShippingMethod;
+  shipping_cost: number;
+  subtotal: number;
+  points_discount: number;
+  points_used: number;
+  total: number;
+  points_earned: number;
+  payment_method: string;
+  payment_status: PaymentStatus;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  // Relaciones opcionales
+  items?: OrderItem[];
+  shipping_address?: CustomerAddress;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name: string;
+  product_sku?: string;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+  points_earned: number;
+  created_at: string;
+}
+
+export interface PointsLedgerEntry {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  order_id?: string;
+  movement_type: MovementType;
+  points: number;
+  balance_after: number;
+  description: string;
+  expires_at?: string;
+  created_at: string;
+}
+
+export interface PointsBalance {
+  user_id: string;
+  tenant_id: string;
+  current_balance: number;
+  total_earned: number;
+  total_redeemed: number;
+  total_expired: number;
+  tier: Tier;
+  updated_at: string;
+}
+
+export interface LoyaltyConfig {
+  id: string;
+  tenant_id: string;
+  points_per_1000: number;
+  bonus_categories: string[];
+  min_redeem: number;
+  max_redeem_pct: number;
+  point_value_clp: number;
+  expiry_months: number;
+  tiers: { name: Tier; min_points: number; multiplier: number }[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuditLog {
