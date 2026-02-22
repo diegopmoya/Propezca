@@ -1,8 +1,9 @@
-// Detalle de producto
+// Detalle de producto real
 "use client";
 
 import { use, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +16,7 @@ import {
   Plus,
   ChevronRight,
 } from "lucide-react";
-import { demoProducts, demoCategories } from "@/lib/demo-data";
+import { realProducts } from "@/lib/products-data";
 import { useCartStore } from "@/stores/cart-store";
 import { formatCLP } from "@/lib/utils";
 
@@ -28,7 +29,7 @@ export default function ProductDetailPage({
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((s) => s.addItem);
 
-  const product = demoProducts.find((p) => p.id === productId);
+  const product = realProducts.find((p) => p.id === productId);
   if (!product) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
@@ -41,11 +42,10 @@ export default function ProductDetailPage({
     );
   }
 
-  const category = demoCategories.find((c) => c.id === product.category_id);
-  const relatedProducts = demoProducts
-    .filter(
-      (p) => p.category_id === product.category_id && p.id !== product.id
-    )
+  // Productos relacionados: misma primera palabra del nombre
+  const firstWord = product.name.split(" ")[0].toUpperCase();
+  const relatedProducts = realProducts
+    .filter((p) => p.id !== product.id && p.name.toUpperCase().startsWith(firstWord))
     .slice(0, 4);
 
   const handleAdd = () => {
@@ -61,55 +61,49 @@ export default function ProductDetailPage({
           Tienda
         </Link>
         <ChevronRight className="h-4 w-4" />
-        {category && (
-          <>
-            <Link
-              href={`/tienda?category=${category.id}`}
-              className="hover:text-foreground"
-            >
-              {category.name}
-            </Link>
-            <ChevronRight className="h-4 w-4" />
-          </>
-        )}
         <span className="text-foreground">{product.name}</span>
       </nav>
 
       {/* Producto */}
       <div className="grid gap-8 md:grid-cols-2">
         {/* Imagen */}
-        <div className="flex aspect-square items-center justify-center rounded-lg border bg-muted/30">
-          <Fish className="h-32 w-32 text-muted-foreground/20" />
+        <div className="relative aspect-square overflow-hidden rounded-lg border bg-white">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-contain p-4"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
         </div>
 
         {/* Info */}
         <div>
-          {product.brand && (
-            <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-              {product.brand}
-            </p>
-          )}
-          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
-            {product.name}
-          </h1>
-          {product.sku && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              SKU: {product.sku}
-            </p>
-          )}
+          <h1 className="text-2xl font-bold sm:text-3xl">{product.name}</h1>
 
           <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold">
-              {formatCLP(product.sale_price ?? 0)}
+            <span className="text-3xl font-bold text-primary">
+              {formatCLP(product.price)}
             </span>
           </div>
 
-          {product.points_value && product.points_value > 0 && (
-            <Badge variant="secondary" className="mt-2">
+          {product.points > 0 && (
+            <Badge className="mt-2 bg-accent text-accent-foreground">
               <Star className="mr-1 h-3.5 w-3.5" />
-              Gana {product.points_value} puntos con esta compra
+              Gana {product.points} puntos con esta compra
             </Badge>
           )}
+
+          <div className="mt-3">
+            {product.stock > 0 ? (
+              <p className="text-sm font-medium text-green-600">
+                {product.stock} unidad{product.stock !== 1 ? "es" : ""} disponible{product.stock !== 1 ? "s" : ""}
+              </p>
+            ) : (
+              <p className="text-sm font-medium text-red-600">Agotado</p>
+            )}
+          </div>
 
           <Separator className="my-6" />
 
@@ -133,23 +127,23 @@ export default function ProductDetailPage({
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9 rounded-l-none"
-                onClick={() => setQuantity(quantity + 1)}
+                onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                disabled={quantity >= product.stock}
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          <Button size="lg" className="mt-6 w-full sm:w-auto" onClick={handleAdd}>
+          <Button
+            size="lg"
+            className="mt-6 w-full sm:w-auto"
+            onClick={handleAdd}
+            disabled={product.stock === 0}
+          >
             <ShoppingCart className="mr-2 h-5 w-5" />
             Agregar al Carrito
           </Button>
-
-          {product.is_active && (
-            <p className="mt-4 text-sm text-green-600 font-medium">
-              Disponible para envío
-            </p>
-          )}
         </div>
       </div>
 
@@ -164,23 +158,24 @@ export default function ProductDetailPage({
                 className="group overflow-hidden border shadow-sm transition-shadow hover:shadow-md"
               >
                 <Link href={`/tienda/${p.id}`}>
-                  <div className="flex aspect-square items-center justify-center bg-muted/30">
-                    <Fish className="h-12 w-12 text-muted-foreground/30 transition-colors group-hover:text-primary/40" />
+                  <div className="relative aspect-square overflow-hidden bg-white">
+                    <Image
+                      src={p.image}
+                      alt={p.name}
+                      fill
+                      className="object-contain p-2 transition-transform group-hover:scale-105"
+                      sizes="25vw"
+                    />
                   </div>
                 </Link>
                 <CardContent className="p-3">
-                  {p.brand && (
-                    <p className="text-xs font-medium uppercase text-muted-foreground">
-                      {p.brand}
-                    </p>
-                  )}
                   <Link href={`/tienda/${p.id}`}>
-                    <h3 className="mt-1 line-clamp-2 text-sm font-semibold hover:text-primary">
+                    <h3 className="line-clamp-2 text-sm font-semibold hover:text-primary">
                       {p.name}
                     </h3>
                   </Link>
-                  <p className="mt-1 font-bold">
-                    {formatCLP(p.sale_price ?? 0)}
+                  <p className="mt-1 font-bold text-primary">
+                    {formatCLP(p.price)}
                   </p>
                 </CardContent>
               </Card>

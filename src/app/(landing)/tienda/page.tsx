@@ -1,8 +1,9 @@
-// Catálogo público de productos
+// Catálogo público de productos reales
 "use client";
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,39 +24,37 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Fish, Search, SlidersHorizontal, Star, ShoppingCart } from "lucide-react";
-import { demoProducts, demoCategories } from "@/lib/demo-data";
+import { realProducts, type ScrapedProduct } from "@/lib/products-data";
 import { useCartStore } from "@/stores/cart-store";
 import { formatCLP } from "@/lib/utils";
 
-// Marcas únicas de los productos
-const brands = [...new Set(demoProducts.map((p) => p.brand).filter(Boolean))].sort() as string[];
+// Nombres únicos para filtro
+const uniqueNames = [...new Set(realProducts.map((p) => p.name))].sort();
+
+type SortOption = "name" | "price-asc" | "price-desc" | "points";
 
 function FilterPanel({
   search,
   setSearch,
-  category,
-  setCategory,
-  brand,
-  setBrand,
   priceMin,
   setPriceMin,
   priceMax,
   setPriceMax,
   onlyInStock,
   setOnlyInStock,
+  sortBy,
+  setSortBy,
 }: {
   search: string;
   setSearch: (v: string) => void;
-  category: string;
-  setCategory: (v: string) => void;
-  brand: string;
-  setBrand: (v: string) => void;
   priceMin: string;
   setPriceMin: (v: string) => void;
   priceMax: string;
   setPriceMax: (v: string) => void;
   onlyInStock: boolean;
   setOnlyInStock: (v: boolean) => void;
+  sortBy: SortOption;
+  setSortBy: (v: SortOption) => void;
 }) {
   return (
     <div className="space-y-5">
@@ -73,35 +72,16 @@ function FilterPanel({
       </div>
 
       <div>
-        <Label className="text-sm font-medium">Categoría</Label>
-        <Select value={category} onValueChange={setCategory}>
+        <Label className="text-sm font-medium">Ordenar por</Label>
+        <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
           <SelectTrigger className="mt-1.5">
-            <SelectValue placeholder="Todas" />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todas</SelectItem>
-            {demoCategories.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                {cat.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label className="text-sm font-medium">Marca</Label>
-        <Select value={brand} onValueChange={setBrand}>
-          <SelectTrigger className="mt-1.5">
-            <SelectValue placeholder="Todas" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas</SelectItem>
-            {brands.map((b) => (
-              <SelectItem key={b} value={b}>
-                {b}
-              </SelectItem>
-            ))}
+            <SelectItem value="name">Nombre A-Z</SelectItem>
+            <SelectItem value="price-asc">Precio: menor a mayor</SelectItem>
+            <SelectItem value="price-desc">Precio: mayor a menor</SelectItem>
+            <SelectItem value="points">Más puntos</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -133,67 +113,67 @@ function FilterPanel({
           className="rounded border-input"
         />
         <Label htmlFor="in-stock" className="text-sm">
-          Solo disponibles
+          Solo con stock
         </Label>
       </div>
     </div>
   );
 }
 
-function ProductCard({ product }: { product: (typeof demoProducts)[0] }) {
+function ProductCard({ product }: { product: ScrapedProduct }) {
   const addItem = useCartStore((s) => s.addItem);
-  const categoryName = demoCategories.find((c) => c.id === product.category_id)?.name;
 
   return (
     <Card className="group overflow-hidden border shadow-sm transition-shadow hover:shadow-md">
       <Link href={`/tienda/${product.id}`}>
-        <div className="flex aspect-square items-center justify-center bg-muted/30">
-          <Fish className="h-16 w-16 text-muted-foreground/30 transition-colors group-hover:text-primary/40" />
+        <div className="relative aspect-square overflow-hidden bg-muted/30">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-contain p-2 transition-transform group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          />
         </div>
       </Link>
-      <CardContent className="p-4">
-        {product.brand && (
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {product.brand}
-          </p>
-        )}
+      <CardContent className="p-3">
         <Link href={`/tienda/${product.id}`}>
-          <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-tight hover:text-primary">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-tight hover:text-primary">
             {product.name}
           </h3>
         </Link>
-        <div className="mt-2 flex items-center gap-2">
-          <span className="text-lg font-bold">
-            {formatCLP(product.sale_price ?? 0)}
+        <div className="mt-1.5 flex items-center gap-2">
+          <span className="text-lg font-bold text-primary">
+            {formatCLP(product.price)}
           </span>
         </div>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {product.points_value && product.points_value > 0 && (
-            <Badge variant="secondary" className="text-xs">
-              <Star className="mr-1 h-3 w-3" />
-              +{product.points_value} pts
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {product.points > 0 && (
+            <Badge className="bg-accent text-accent-foreground text-xs">
+              <Star className="mr-0.5 h-3 w-3" />
+              +{product.points} pts
             </Badge>
           )}
-          {categoryName && (
-            <Badge variant="outline" className="text-xs">
-              {categoryName}
+          {product.stock > 0 ? (
+            <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+              Stock: {product.stock}
             </Badge>
-          )}
-          {product.is_active && (
-            <Badge className="bg-green-100 text-green-800 text-xs hover:bg-green-100">
-              Disponible
+          ) : (
+            <Badge variant="outline" className="text-xs text-red-600 border-red-300">
+              Agotado
             </Badge>
           )}
         </div>
         <Button
           size="sm"
-          className="mt-3 w-full"
+          className="mt-2 w-full"
           onClick={(e) => {
             e.preventDefault();
             addItem(product, 1);
           }}
+          disabled={product.stock === 0}
         >
-          <ShoppingCart className="mr-2 h-4 w-4" />
+          <ShoppingCart className="mr-1.5 h-4 w-4" />
           Agregar
         </Button>
       </CardContent>
@@ -203,36 +183,47 @@ function ProductCard({ product }: { product: (typeof demoProducts)[0] }) {
 
 export default function TiendaPage() {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [brand, setBrand] = useState("all");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [onlyInStock, setOnlyInStock] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>("name");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const filtered = useMemo(() => {
-    return demoProducts.filter((p) => {
+    let result = realProducts.filter((p) => {
       if (search) {
         const q = search.toLowerCase();
-        if (
-          !p.name.toLowerCase().includes(q) &&
-          !(p.brand ?? "").toLowerCase().includes(q) &&
-          !(p.sku ?? "").toLowerCase().includes(q)
-        )
-          return false;
+        if (!p.name.toLowerCase().includes(q)) return false;
       }
-      if (category !== "all" && p.category_id !== category) return false;
-      if (brand !== "all" && p.brand !== brand) return false;
-      if (priceMin && (p.sale_price ?? 0) < Number(priceMin)) return false;
-      if (priceMax && (p.sale_price ?? 0) > Number(priceMax)) return false;
-      if (onlyInStock && !p.is_active) return false;
+      if (priceMin && p.price < Number(priceMin)) return false;
+      if (priceMax && p.price > Number(priceMax)) return false;
+      if (onlyInStock && p.stock <= 0) return false;
       return true;
     });
-  }, [search, category, brand, priceMin, priceMax, onlyInStock]);
+
+    // Ordenar
+    switch (sortBy) {
+      case "name":
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "price-asc":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "points":
+        result.sort((a, b) => b.points - a.points);
+        break;
+    }
+
+    return result;
+  }, [search, priceMin, priceMax, onlyInStock, sortBy]);
 
   const filterProps = {
-    search, setSearch, category, setCategory, brand, setBrand,
-    priceMin, setPriceMin, priceMax, setPriceMax, onlyInStock, setOnlyInStock,
+    search, setSearch, priceMin, setPriceMin,
+    priceMax, setPriceMax, onlyInStock, setOnlyInStock,
+    sortBy, setSortBy,
   };
 
   return (
@@ -274,7 +265,7 @@ export default function TiendaPage() {
           </div>
         </aside>
 
-        {/* Product grid */}
+        {/* Product grid — 4/3/2/1 cols */}
         <div className="flex-1">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -285,7 +276,7 @@ export default function TiendaPage() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
               {filtered.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

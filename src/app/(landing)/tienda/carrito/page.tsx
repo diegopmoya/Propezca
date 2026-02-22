@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -28,7 +29,7 @@ export default function CarritoPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
-        <ShoppingCart className="mx-auto mb-4 h-16 w-16 text-muted-foreground/30" />
+        <Fish className="mx-auto mb-4 h-16 w-16 text-muted-foreground/30" />
         <h1 className="text-2xl font-bold">Tu carrito está vacío</h1>
         <p className="mt-2 text-muted-foreground">
           Agrega productos desde nuestra tienda para comenzar
@@ -60,8 +61,14 @@ export default function CarritoPage() {
               <CardContent className="p-4">
                 <div className="flex gap-4">
                   {/* Imagen */}
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-md bg-muted/30">
-                    <Fish className="h-8 w-8 text-muted-foreground/30" />
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-white">
+                    <Image
+                      src={item.product.image}
+                      alt={item.product.name}
+                      fill
+                      className="object-contain p-1"
+                      sizes="80px"
+                    />
                   </div>
 
                   {/* Info */}
@@ -73,14 +80,9 @@ export default function CarritoPage() {
                       >
                         {item.product.name}
                       </Link>
-                      {item.product.brand && (
-                        <p className="text-xs text-muted-foreground">
-                          {item.product.brand}
-                        </p>
-                      )}
                     </div>
-                    <p className="text-sm font-bold">
-                      {formatCLP(item.product.sale_price ?? 0)}
+                    <p className="text-sm font-bold text-primary">
+                      {formatCLP(item.product.price)}
                     </p>
                   </div>
 
@@ -121,9 +123,7 @@ export default function CarritoPage() {
                       </Button>
                     </div>
                     <p className="text-sm font-bold">
-                      {formatCLP(
-                        (item.product.sale_price ?? 0) * item.quantity
-                      )}
+                      {formatCLP(item.product.price * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -147,9 +147,9 @@ export default function CarritoPage() {
                 <span className="font-medium">{formatCLP(getTotal())}</span>
               </div>
 
-              <div className="flex items-center gap-1.5 rounded-md bg-amber-50 px-3 py-2 text-sm">
-                <Star className="h-4 w-4 text-amber-500" />
-                <span className="text-amber-800">
+              <div className="flex items-center gap-1.5 rounded-md bg-accent/10 px-3 py-2 text-sm">
+                <Star className="h-4 w-4 text-accent" />
+                <span>
                   Ganarías{" "}
                   <strong>{getPointsEarned().toLocaleString("es-CL")}</strong>{" "}
                   puntos

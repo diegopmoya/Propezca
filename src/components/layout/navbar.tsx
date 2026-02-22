@@ -1,4 +1,4 @@
-// Navbar para la landing page y tienda
+// Navbar con identidad Propezca pesca
 "use client";
 
 import { useState } from "react";
@@ -7,13 +7,14 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ShoppingCart, User } from "lucide-react";
+import { Menu, ShoppingCart, User, Fish } from "lucide-react";
 import { useCartStore } from "@/stores/cart-store";
 
 const navLinks = [
   { label: "Tienda", href: "/tienda" },
-  { label: "Características", href: "/#caracteristicas" },
-  { label: "Cómo Funciona", href: "/#como-funciona" },
+  { label: "Puntos", href: "/#puntos" },
+  { label: "Nosotros", href: "/#nosotros" },
+  { label: "Contacto", href: "/#contacto" },
   { label: "FAQ", href: "/#faq" },
 ];
 
@@ -24,23 +25,24 @@ export function Navbar() {
   const count = itemCount();
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 border-b border-primary/20 bg-primary text-white">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-foreground">
-          Propezca<span className="text-primary"> Control</span>
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-white">
+          <Fish className="h-6 w-6" />
+          PROPEZCA
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-5 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-foreground ${
+              className={`text-sm font-medium transition-colors hover:text-white ${
                 pathname === link.href || pathname.startsWith(link.href + "/")
-                  ? "text-foreground"
-                  : "text-muted-foreground"
+                  ? "text-white"
+                  : "text-white/70"
               }`}
             >
               {link.label}
@@ -49,11 +51,11 @@ export function Navbar() {
 
           {/* Carrito */}
           <Link href="/tienda/carrito" className="relative">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <ShoppingCart className="h-5 w-5" />
             </Button>
             {count > 0 && (
-              <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs">
+              <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent p-0 text-xs text-white">
                 {count}
               </Badge>
             )}
@@ -61,30 +63,27 @@ export function Navbar() {
 
           {/* Mi Cuenta */}
           <Link href="/cuenta">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
               <User className="mr-1.5 h-4 w-4" />
               Mi Cuenta
             </Button>
           </Link>
 
           <Link href="/login">
-            <Button variant="ghost" size="sm">
+            <Button variant="outline" size="sm" className="border-white/30 text-white hover:bg-white/10">
               Ingresar
             </Button>
-          </Link>
-          <Link href="/register">
-            <Button size="sm">Comenzar</Button>
           </Link>
         </div>
 
         {/* Mobile: cart + hamburger */}
         <div className="flex items-center gap-2 md:hidden">
           <Link href="/tienda/carrito" className="relative">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <ShoppingCart className="h-5 w-5" />
             </Button>
             {count > 0 && (
-              <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs">
+              <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent p-0 text-xs text-white">
                 {count}
               </Badge>
             )}
@@ -92,7 +91,7 @@ export function Navbar() {
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -102,7 +101,7 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-sm font-medium text-muted-foreground"
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
@@ -115,12 +114,9 @@ export function Navbar() {
                   </Button>
                 </Link>
                 <Link href="/login" onClick={() => setOpen(false)}>
-                  <Button variant="ghost" className="w-full">
+                  <Button variant="outline" className="w-full">
                     Ingresar
                   </Button>
-                </Link>
-                <Link href="/register" onClick={() => setOpen(false)}>
-                  <Button className="w-full">Comenzar</Button>
                 </Link>
               </div>
             </SheetContent>

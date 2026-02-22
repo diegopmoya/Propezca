@@ -412,7 +412,7 @@ export default function CheckoutPage() {
                         </span>
                         <span className="font-medium">
                           {formatCLP(
-                            (item.product.sale_price ?? 0) * item.quantity
+                            item.product.price * item.quantity
                           )}
                         </span>
                       </div>
@@ -534,7 +534,7 @@ export default function CheckoutPage() {
                   </span>
                   <span className="shrink-0 font-medium">
                     {formatCLP(
-                      (item.product.sale_price ?? 0) * item.quantity
+                      item.product.price * item.quantity
                     )}
                   </span>
                 </div>

@@ -1,16 +1,16 @@
 // Store de carrito con Zustand (persistido en localStorage)
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Product } from "@/types/database";
+import type { ScrapedProduct } from "@/lib/products-data";
 
 export interface CartItem {
-  product: Product;
+  product: ScrapedProduct;
   quantity: number;
 }
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
+  addItem: (product: ScrapedProduct, quantity?: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -64,15 +64,14 @@ export const useCartStore = create<CartState>()(
 
       getTotal: () => {
         return get().items.reduce(
-          (total, item) => total + (item.product.sale_price ?? 0) * item.quantity,
+          (total, item) => total + item.product.price * item.quantity,
           0
         );
       },
 
       getPointsEarned: () => {
         return get().items.reduce(
-          (total, item) =>
-            total + (item.product.points_value ?? 0) * item.quantity,
+          (total, item) => total + item.product.points * item.quantity,
           0
         );
       },
